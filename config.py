@@ -39,6 +39,7 @@ class ModelConfig:
     languages: List[str]
     specializations: List[str]
     quantum_entanglement_group: int
+    knowledge_domain: str  # Домен знаний для данной модели
 
 
 class Mozgach2Config:
@@ -74,18 +75,24 @@ class Mozgach2Config:
         DeviceClass.SERVER: 16
     }
     
-    # Языки БРИКС
-    BRICS_LANGUAGES = [
-        "pt",  # Португальский (Бразилия)
+    # Языки РФ+СНГ
+    RF_CIS_LANGUAGES = [
         "ru",  # Русский (Россия)
-        "hi",  # Хинди (Индия)
-        "zh",  # Китайский (Китай)
-        "en",  # Английский (ЮАР)
-        "af",  # Африкаанс (ЮАР)
-        "zu",  # Зулу (ЮАР)
-        "bn",  # Бенгальский (Индия)
-        "te",  # Телугу (Индия)
-        "ta"   # Тамильский (Индия)
+        "be",  # Белорусский (Беларусь)
+        "kk",  # Казахский (Казахстан)
+        "uk",  # Украинский (Украина)
+        "uz",  # Узбекский (Узбекистан)
+        "ky",  # Кыргызский (Кыргызстан)
+        "tg",  # Таджикский (Таджикистан)
+        "tk",  # Туркменский (Туркменистан)
+        "az",  # Азербайджанский (Азербайджан)
+        "hy",  # Армянский (Армения)
+        "ka",  # Грузинский (Грузия)
+        "mo",  # Молдавский (Молдова)
+        "en",  # Английский (международный)
+        "de",  # Немецкий (для взаимодействия с ЕС)
+        "zh",  # Китайский (для взаимодействия с Китаем)
+        "ar"   # Арабский (для взаимодействия с Ближним Востоком)
     ]
     
     # Духовные источники
@@ -100,6 +107,54 @@ class Mozgach2Config:
         "zen",           # Дзен
         "sufism",        # Суфизм
         "kabbalah"       # Каббала
+    ]
+    
+    # 108 доменов знаний
+    KNOWLEDGE_DOMAINS = [
+        # Общие знания (16 доменов)
+        "general_knowledge", "common_sense", "everyday_life", "social_norms",
+        "human_behavior", "communication", "relationships", "family",
+        "education", "learning", "memory", "cognition", "psychology",
+        "sociology", "anthropology", "cultural_studies",
+        
+        # Технические знания (20 доменов)
+        "mathematics", "physics", "chemistry", "biology", "astronomy",
+        "geology", "meteorology", "oceanography", "computer_science",
+        "engineering", "architecture", "robotics", "artificial_intelligence",
+        "data_science", "cybersecurity", "blockchain", "quantum_computing",
+        "nanotechnology", "biotechnology", "renewable_energy",
+        
+        # Духовные знания (18 доменов)
+        "buddhism_philosophy", "hinduism_philosophy", "islam_philosophy",
+        "christianity_philosophy", "judaism_philosophy", "taoism_philosophy",
+        "confucianism_philosophy", "zen_philosophy", "sufism_philosophy",
+        "kabbalah_philosophy", "meditation_practices", "yoga_practices",
+        "mindfulness", "spiritual_healing", "energy_work", "chakras",
+        "astral_projection", "consciousness_studies",
+        
+        # Разговорные знания (22 домена)
+        "russian_culture", "belarusian_culture", "kazakh_culture",
+        "ukrainian_culture", "uzbek_culture", "kyrgyz_culture",
+        "tajik_culture", "turkmen_culture", "azerbaijani_culture",
+        "armenian_culture", "georgian_culture", "moldovan_culture",
+        "slavic_languages", "turkic_languages", "caucasian_languages",
+        "baltic_languages", "eastern_european_culture", "central_asian_culture",
+        "eurasian_culture", "post_soviet_culture", "multicultural_dialogue",
+        "cross_cultural_communication",
+        
+        # Бизнес знания (12 доменов)
+        "economics", "finance", "accounting", "marketing", "management",
+        "strategy", "operations", "human_resources", "entrepreneurship",
+        "investment", "international_trade", "business_ethics",
+        
+        # Творческие знания (12 доменов)
+        "visual_arts", "music", "literature", "theater", "cinema",
+        "dance", "design", "photography", "sculpture", "architecture",
+        "creative_writing", "art_history",
+        
+        # Специализированные знания (8 доменов)
+        "medicine", "law", "military", "agriculture", "transportation",
+        "tourism", "sports", "entertainment"
     ]
     
     # Настройки квантовой запутанности
@@ -143,6 +198,9 @@ class Mozgach2Config:
                 # Определяем группу квантовой запутанности
                 quantum_group = model_id // cls.MODELS_PER_GROUP
                 
+                # Определяем домен знаний для данной модели
+                knowledge_domain = cls.KNOWLEDGE_DOMAINS[model_id]
+                
                 config = ModelConfig(
                     name=f"mozgach2_{model_type.value}_{i+1:02d}",
                     type=model_type,
@@ -151,7 +209,8 @@ class Mozgach2Config:
                     model_size_mb=cls._get_model_size(model_type, device_class),
                     languages=cls._get_languages_for_model(model_type),
                     specializations=cls._get_specializations_for_model(model_type),
-                    quantum_entanglement_group=quantum_group
+                    quantum_entanglement_group=quantum_group,
+                    knowledge_domain=knowledge_domain
                 )
                 configs.append(config)
                 model_id += 1
@@ -199,11 +258,11 @@ class Mozgach2Config:
     def _get_languages_for_model(cls, model_type: ModelType) -> List[str]:
         """Определяет языки для модели на основе её типа"""
         if model_type == ModelType.CONVERSATIONAL:
-            return cls.BRICS_LANGUAGES
+            return cls.RF_CIS_LANGUAGES
         elif model_type == ModelType.SPIRITUAL:
-            return ["en", "ru", "hi", "zh", "sa"]  # Основные языки духовных текстов
+            return ["ru", "en", "hi", "zh", "sa"]  # Основные языки духовных текстов
         else:
-            return ["en", "ru"]  # Базовые языки
+            return ["ru", "en"]  # Базовые языки
     
     @classmethod
     def _get_specializations_for_model(cls, model_type: ModelType) -> List[str]:
@@ -233,6 +292,7 @@ if __name__ == "__main__":
     print(f"Распределение по устройствам:")
     for device_class, count in config.DEVICE_DISTRIBUTION.items():
         print(f"  {device_class.value}: {count}")
+    print(f"Доменов знаний: {len(config.KNOWLEDGE_DOMAINS)}")
     
     # Генерируем конфигурации моделей
     model_configs = config.get_model_configs()
@@ -242,3 +302,4 @@ if __name__ == "__main__":
     print(f"\nПримеры конфигураций:")
     for i, model_config in enumerate(model_configs[:3]):
         print(f"  {i+1}. {model_config.name} ({model_config.type.value}) - {model_config.device_class.value}")
+        print(f"     Домен знаний: {model_config.knowledge_domain}")

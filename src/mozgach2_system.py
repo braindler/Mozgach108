@@ -1,6 +1,7 @@
 """
 Основная система Mozgach2
 Управление 108 квантово-запутанными языковыми моделями
+Модели обучались параллельно на едином датасете, разбитом на 108 различных доменов знаний
 """
 
 import asyncio
@@ -26,6 +27,7 @@ class QueryResult:
     processing_time: float
     model_type: ModelType
     quantum_group: int
+    knowledge_domain: str  # Домен знаний, использованный для ответа
 
 
 @dataclass
@@ -75,10 +77,11 @@ class ModelManager:
                 "config": model_config,
                 "loaded_at": time.time(),
                 "memory_usage": model_config.model_size_mb / 1024,  # GB
-                "status": "loaded"
+                "status": "loaded",
+                "knowledge_domain": model_config.knowledge_domain
             }
             
-            self.logger.info(f"Модель {model_name} успешно загружена")
+            self.logger.info(f"Модель {model_name} успешно загружена (домен: {model_config.knowledge_domain})")
             return True
             
         except Exception as e:
@@ -167,39 +170,72 @@ class QuantumEntanglementManager:
 
 
 class QueryRouter:
-    """Маршрутизатор запросов к оптимальным моделям"""
+    """Маршрутизатор запросов к оптимальным моделям по доменам знаний"""
     
     def __init__(self, model_manager: ModelManager, quantum_manager: QuantumEntanglementManager):
         self.model_manager = model_manager
         self.quantum_manager = quantum_manager
         self.logger = logging.getLogger(__name__)
         
-        # Классификатор типов запросов
+        # Классификатор типов запросов по доменам знаний
         self.query_classifiers = {
             ModelType.TECHNICAL: [
                 "как работает", "технология", "наука", "инженерия", "математика",
-                "физика", "химия", "биология", "программирование", "алгоритм"
+                "физика", "химия", "биология", "программирование", "алгоритм",
+                "астрономия", "геология", "робототехника", "искусственный интеллект"
             ],
             ModelType.SPIRITUAL: [
                 "душа", "бог", "медитация", "философия", "религия", "буддизм",
-                "индуизм", "ислам", "христианство", "карма", "реинкарнация"
+                "индуизм", "ислам", "христианство", "карма", "реинкарнация",
+                "дзен", "суфизм", "каббала", "чакры", "энергетическая работа"
             ],
             ModelType.BUSINESS: [
                 "бизнес", "экономика", "финансы", "инвестиции", "стратегия",
-                "маркетинг", "менеджмент", "прибыль", "рынок", "конкуренция"
+                "маркетинг", "менеджмент", "прибыль", "рынок", "конкуренция",
+                "бухгалтерия", "операции", "человеческие ресурсы", "предпринимательство"
             ],
             ModelType.CREATIVE: [
                 "искусство", "творчество", "поэзия", "музыка", "живопись",
-                "дизайн", "вдохновение", "креативность", "эстетика"
+                "дизайн", "вдохновение", "креативность", "эстетика",
+                "театр", "кино", "танец", "фотография", "скульптура"
             ],
             ModelType.CONVERSATIONAL: [
                 "привет", "как дела", "поговорим", "расскажи", "история",
-                "анекдот", "шутка", "разговор", "общение"
+                "анекдот", "шутка", "разговор", "общение", "культура",
+                "традиции", "обычаи", "язык", "диалект", "идиомы"
             ]
+        }
+        
+        # Классификатор доменов знаний
+        self.domain_classifiers = {
+            # Технические домены
+            "mathematics": ["математика", "числа", "формула", "уравнение", "геометрия"],
+            "physics": ["физика", "механика", "электричество", "магнетизм", "квантовая"],
+            "computer_science": ["программирование", "алгоритм", "код", "программа", "компьютер"],
+            "engineering": ["инженерия", "конструкция", "проект", "технический", "механизм"],
+            
+            # Духовные домены
+            "buddhism_philosophy": ["буддизм", "дхарма", "сансара", "нирвана", "карма"],
+            "meditation_practices": ["медитация", "дыхание", "осознанность", "дзен", "самадхи"],
+            "spiritual_healing": ["исцеление", "энергия", "чакры", "аура", "биоэнергетика"],
+            
+            # Культурные домены
+            "russian_culture": ["русская культура", "традиции", "обычаи", "фольклор", "русский"],
+            "slavic_languages": ["славянские языки", "славянская культура", "славяне"],
+            "eurasian_culture": ["евразийская культура", "евразия", "евразийство"],
+            
+            # Бизнес домены
+            "economics": ["экономика", "рынок", "спрос", "предложение", "цена"],
+            "finance": ["финансы", "деньги", "банк", "кредит", "инвестиции"],
+            
+            # Творческие домены
+            "visual_arts": ["изобразительное искусство", "живопись", "рисунок", "картина"],
+            "music": ["музыка", "мелодия", "ритм", "гармония", "инструмент"],
+            "literature": ["литература", "книга", "роман", "поэзия", "проза"]
         }
     
     def classify_query(self, query: str) -> ModelType:
-        """Классифицирует тип запроса"""
+        """Классифицирует тип запроса по доменам знаний"""
         query_lower = query.lower()
         
         # Подсчитываем баллы для каждого типа
@@ -216,10 +252,56 @@ class QueryRouter:
         
         return max(scores, key=scores.get)
     
+    def classify_knowledge_domain(self, query: str) -> str:
+        """Классифицирует запрос по конкретному домену знаний"""
+        query_lower = query.lower()
+        
+        # Подсчитываем баллы для каждого домена
+        domain_scores = {}
+        
+        for domain, keywords in self.domain_classifiers.items():
+            score = 0
+            for keyword in keywords:
+                if keyword in query_lower:
+                    score += 1
+            if score > 0:
+                domain_scores[domain] = score
+        
+        # Возвращаем домен с наивысшим баллом
+        if domain_scores:
+            return max(domain_scores, key=domain_scores.get)
+        
+        # Если не удалось определить, возвращаем общий домен
+        return "general_knowledge"
+    
     def select_optimal_model(self, query: str, query_type: ModelType) -> str:
-        """Выбирает оптимальную модель для запроса"""
+        """Выбирает оптимальную модель для запроса по домену знаний"""
+        # Определяем конкретный домен знаний
+        knowledge_domain = self.classify_knowledge_domain(query)
+        
         # Получаем группу запутанных моделей
         optimal_group = self.quantum_manager.get_optimal_model_group(query, query_type)
+        
+        # Ищем модель с наиболее подходящим доменом знаний
+        best_model = None
+        best_domain_match = 0
+        
+        for model_name in optimal_group:
+            model_config = next(
+                (cfg for cfg in config.get_model_configs() if cfg.name == model_name), 
+                None
+            )
+            if model_config and model_config.knowledge_domain == knowledge_domain:
+                best_model = model_name
+                break
+            elif model_config and model_config.knowledge_domain in knowledge_domain:
+                # Частичное совпадение домена
+                if len(model_config.knowledge_domain) > best_domain_match:
+                    best_domain_match = len(model_config.knowledge_domain)
+                    best_model = model_name
+        
+        if best_model:
+            return best_model
         
         if not optimal_group:
             # Если группа пуста, ищем любую доступную модель нужного типа
@@ -265,7 +347,7 @@ class Mozgach2System:
             await asyncio.sleep(0.1)  # Небольшая задержка между загрузками
     
     async def query(self, query_text: str, model_type: Optional[ModelType] = None) -> QueryResult:
-        """Обрабатывает запрос пользователя"""
+        """Обрабатывает запрос пользователя по доменам знаний"""
         start_time = time.time()
         self.active_queries += 1
         
@@ -274,7 +356,10 @@ class Mozgach2System:
             if model_type is None:
                 model_type = self.query_router.classify_query(query_text)
             
-            # Выбираем оптимальную модель
+            # Определяем домен знаний для запроса
+            knowledge_domain = self.query_router.classify_knowledge_domain(query_text)
+            
+            # Выбираем оптимальную модель по домену знаний
             model_name = self.query_router.select_optimal_model(query_text, model_type)
             
             # Загружаем модель, если она не загружена
@@ -301,7 +386,8 @@ class Mozgach2System:
                 confidence=0.95,  # В реальности это будет вычисляться моделью
                 processing_time=processing_time,
                 model_type=model_config.type if model_config else ModelType.GENERAL,
-                quantum_group=model_config.quantum_entanglement_group if model_config else 0
+                quantum_group=model_config.quantum_entanglement_group if model_config else 0,
+                knowledge_domain=knowledge_domain
             )
             
             # Сохраняем в историю
@@ -311,7 +397,7 @@ class Mozgach2System:
                 "timestamp": time.time()
             })
             
-            self.logger.info(f"Запрос обработан моделью {model_name} за {processing_time:.3f}с")
+            self.logger.info(f"Запрос обработан моделью {model_name} (домен: {knowledge_domain}) за {processing_time:.3f}с")
             return result
             
         except Exception as e:
@@ -323,29 +409,60 @@ class Mozgach2System:
                 confidence=0.0,
                 processing_time=time.time() - start_time,
                 model_type=ModelType.GENERAL,
-                quantum_group=0
+                quantum_group=0,
+                knowledge_domain="unknown"
             )
         finally:
             self.active_queries -= 1
     
     async def _process_query_with_model(self, query: str, model_name: str, model_config: ModelConfig) -> str:
-        """Обрабатывает запрос с конкретной моделью"""
+        """Обрабатывает запрос с конкретной моделью по домену знаний"""
         # Имитация обработки запроса
         await asyncio.sleep(0.1)  # Имитация времени обработки
         
-        # Генерируем ответ на основе типа модели
+        # Получаем домен знаний модели
+        knowledge_domain = model_config.knowledge_domain
+        
+        # Генерируем ответ на основе типа модели и домена знаний
         if model_config.type == ModelType.TECHNICAL:
-            return f"Технический ответ от {model_name}: {query} - это интересный технический вопрос, который требует детального анализа..."
+            if "mathematics" in knowledge_domain:
+                return f"Математический ответ от {model_name} (домен: {knowledge_domain}): {query} - это математическая задача, которая решается с помощью..."
+            elif "physics" in knowledge_domain:
+                return f"Физический ответ от {model_name} (домен: {knowledge_domain}): {query} - это физическое явление, которое объясняется законами..."
+            elif "computer_science" in knowledge_domain:
+                return f"Компьютерный ответ от {model_name} (домен: {knowledge_domain}): {query} - это вопрос программирования, который решается алгоритмом..."
+            else:
+                return f"Технический ответ от {model_name} (домен: {knowledge_domain}): {query} - это интересный технический вопрос, который требует детального анализа..."
         elif model_config.type == ModelType.SPIRITUAL:
-            return f"Духовный ответ от {model_name}: {query} - это глубокий вопрос, который затрагивает суть человеческого существования..."
+            if "buddhism" in knowledge_domain:
+                return f"Буддийский ответ от {model_name} (домен: {knowledge_domain}): {query} - согласно буддийскому учению, это понимается как..."
+            elif "meditation" in knowledge_domain:
+                return f"Медитативный ответ от {model_name} (домен: {knowledge_domain}): {query} - в практике медитации это достигается через..."
+            else:
+                return f"Духовный ответ от {model_name} (домен: {knowledge_domain}): {query} - это глубокий вопрос, который затрагивает суть человеческого существования..."
         elif model_config.type == ModelType.BUSINESS:
-            return f"Бизнес ответ от {model_name}: {query} - с точки зрения бизнеса, это можно рассмотреть следующим образом..."
+            if "economics" in knowledge_domain:
+                return f"Экономический ответ от {model_name} (домен: {knowledge_domain}): {query} - с экономической точки зрения, это анализируется через..."
+            elif "finance" in knowledge_domain:
+                return f"Финансовый ответ от {model_name} (домен: {knowledge_domain}): {query} - в финансовом аспекте, это рассматривается как..."
+            else:
+                return f"Бизнес ответ от {model_name} (домен: {knowledge_domain}): {query} - с точки зрения бизнеса, это можно рассмотреть следующим образом..."
         elif model_config.type == ModelType.CREATIVE:
-            return f"Творческий ответ от {model_name}: {query} - это вдохновляет на творческое осмысление..."
+            if "visual_arts" in knowledge_domain:
+                return f"Художественный ответ от {model_name} (домен: {knowledge_domain}): {query} - в изобразительном искусстве это выражается через..."
+            elif "music" in knowledge_domain:
+                return f"Музыкальный ответ от {model_name} (домен: {knowledge_domain}): {query} - в музыке это проявляется как..."
+            else:
+                return f"Творческий ответ от {model_name} (домен: {knowledge_domain}): {query} - это вдохновляет на творческое осмысление..."
         elif model_config.type == ModelType.CONVERSATIONAL:
-            return f"Разговорный ответ от {model_name}: {query} - давайте обсудим это в непринужденной беседе..."
+            if "russian_culture" in knowledge_domain:
+                return f"Русско-культурный ответ от {model_name} (домен: {knowledge_domain}): {query} - в русской культуре это традиционно понимается как..."
+            elif "slavic" in knowledge_domain:
+                return f"Славянский ответ от {model_name} (домен: {knowledge_domain}): {query} - в славянской традиции это означает..."
+            else:
+                return f"Разговорный ответ от {model_name} (домен: {knowledge_domain}): {query} - давайте обсудим это в непринужденной беседе..."
         else:
-            return f"Общий ответ от {model_name}: {query} - это интересный вопрос, который можно рассмотреть с разных сторон..."
+            return f"Общий ответ от {model_name} (домен: {knowledge_domain}): {query} - это интересный вопрос, который можно рассмотреть с разных сторон..."
     
     async def batch_query(self, queries: List[str]) -> List[QueryResult]:
         """Обрабатывает несколько запросов параллельно"""
@@ -414,11 +531,14 @@ if __name__ == "__main__":
     async def main():
         system = Mozgach2System()
         
-        # Тестовые запросы
+        # Тестовые запросы по различным доменам знаний
         queries = [
             "Как работает квантовая запутанность?",
             "Объясни принципы буддизма",
-            "Расскажи о современных технологиях в бизнесе"
+            "Расскажи о современных технологиях в бизнесе",
+            "Что такое славянская культура?",
+            "Как решить квадратное уравнение?",
+            "Расскажи о русских традициях"
         ]
         
         for query in queries:
@@ -426,6 +546,7 @@ if __name__ == "__main__":
             print(f"Запрос: {query}")
             print(f"Ответ: {result.response}")
             print(f"Модель: {result.model_used}")
+            print(f"Домен знаний: {result.knowledge_domain}")
             print(f"Время: {result.processing_time:.3f}с")
             print("-" * 50)
         
