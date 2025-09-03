@@ -1,4 +1,4 @@
-# Установка Mozgach2
+# Установка mozgach108
 
 ## Требования к системе
 
@@ -19,7 +19,7 @@
 ### 1. Клонирование репозитория
 ```bash
 git clone https://github.com/braindler/mozgach108.git
-cd Mozgach2
+cd mozgach108
 ```
 
 ### 2. Создание виртуального окружения
@@ -27,7 +27,7 @@ cd Mozgach2
 python -m venv mozgach108_env
 source mozgach108_env/bin/activate  # Linux/macOS
 # или
-mozgach2_env\Scripts\activate     # Windows
+mozgach108_env\Scripts\activate     # Windows
 ```
 
 ### 3. Установка зависимостей
