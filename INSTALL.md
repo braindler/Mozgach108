@@ -18,14 +18,14 @@
 
 ### 1. Клонирование репозитория
 ```bash
-git clone https://github.com/your-org/mozgach2.git
+git clone https://github.com/braindler/mozgach108.git
 cd Mozgach2
 ```
 
 ### 2. Создание виртуального окружения
 ```bash
-python -m venv mozgach2_env
-source mozgach2_env/bin/activate  # Linux/macOS
+python -m venv mozgach108_env
+source mozgach108_env/bin/activate  # Linux/macOS
 # или
 mozgach2_env\Scripts\activate     # Windows
 ```
@@ -58,10 +58,10 @@ python -c "import torch; print(torch.cuda.is_available())"
 
 ### Ручная загрузка
 ```python
-from src.mozgach2_system import Mozgach2System
+from src.mozgach108_system import Mozgach108System
 
-system = Mozgach2System(auto_load_models=False)
-await system.model_manager.load_model("mozgach2_general_01")
+system = Mozgach108System(auto_load_models=False)
+await system.model_manager.load_model("mozgach108_general_01")
 ```
 
 ## Устранение неполадок
