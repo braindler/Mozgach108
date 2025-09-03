@@ -1,4 +1,4 @@
-# Mozgach2 - Quantum Entangled Language Model System
+# mozgach108 - Quantum Entangled Language Model System
 
 ## 🚀 Project Overview
 
@@ -21,7 +21,7 @@ Mozgach2 is a revolutionary AI consisting of **108 superposed language models**,
 
 ### Model Structure
 ```
-Mozgach2/
+mozgach108/
 ├── models/
 │   ├── model_001/         # Knowledge domain model 1
 │   ├── model_002/         # Knowledge domain model 2
@@ -37,30 +37,33 @@ Mozgach2/
 - **Knowledge superposition** of each domain in each model
 - **Access to secret knowledge** (including "THE BOOK OF SECRETS") through quantum entanglement
 
-### Device Classification (by Fibonacci Steps)
-The system is optimized for various RAM volumes using the Fibonacci sequence for optimal resource distribution:
+### Classification by Devices
+Optimization of all models: maximum window, minimal model
 
-- **Mobile (1-2GB RAM)**: 8 models
-  - Maximum context window: **2K tokens**
-  - Optimization: maximum window, minimum model
+#### 🚀 Mobile Devices (1-3)
+- **??? RAM**: **50K tokens** *(model: 205MB, context: 103MB, buffer: 51MB)*
+- **??? RAM**: **100K tokens** *(model: 410MB, context: 205MB, buffer: 103MB)*
+- **??? RAM**: **200K tokens** *(model: 820MB, context: 410MB, buffer: 205MB)*
 
-- **Tablets (2-3GB RAM)**: 13 models  
-  - Maximum context window: **4K tokens**
-  - Optimization: balanced ratio between window and model
+#### 💻 Basic Computers (4-7)
+- **??? RAM**: **500K tokens** *(model: 1.6GB, context: 820MB, buffer: 410MB)*
+- **??? RAM**: **1M tokens** *(model: 3.2GB, context: 1.6GB, buffer: 820MB)*
+- **??? RAM**: **2.5M tokens** *(model: 6.4GB, context: 3.2GB, buffer: 1.6GB)*
 
-- **Desktop (3-5GB RAM)**: 21 models
-  - Maximum context window: **8K tokens**
-  - Optimization: expanded window, medium model size
+#### 🖥️ Workstations (8-13)
+- **??? RAM**: **5M tokens** *(model: 9.6GB, context: 4.8GB, buffer: 2.4GB)*
+- **??? RAM**: **8M tokens** *(model: 12.8GB, context: 6.4GB, buffer: 3.2GB)*
+- **??? RAM**: **13M tokens** *(model: 19.2GB, context: 9.6GB, buffer: 4.8GB)*
 
-- **Workstations (5-8GB RAM)**: 34 models
-  - Maximum context window: **16K tokens**
-  - Optimization: large window, full model size
+#### 🚀 Server Solutions (14-21)
+- **??? RAM**: **21M tokens** *(model: 25.6GB, context: 12.8GB, buffer: 6.4GB)*
+- **??? RAM**: **34M tokens** *(model: 38.4GB, context: 19.2GB, buffer: 9.6GB)*
+- **??? RAM**: **55M tokens** *(model: 51.2GB, context: 25.6GB, buffer: 12.8GB)*
 
-- **Servers (8GB+ RAM)**: 32 models (all remaining)
-  - Maximum context window: **32K tokens**
-  - Optimization: maximum window, full model
-
-**Fibonacci Principle**: Each next memory step allows loading a number of models equal to the sum of two previous steps (8+13=21, 13+21=34), ensuring optimal resource usage. **Total count: 108 models**.
+#### 🌌 Supercomputer Clusters (22-34)
+- **??? RAM**: **89M tokens** *(model: 76.8GB, context: 38.4GB, buffer: 19.2GB)*
+- **??? RAM**: **144M tokens** *(model: 102.4GB, context: 51.2GB, buffer: 25.6GB)*
+- **??? RAM**: **233M tokens** *(model: 153.6GB, context: 76.8GB, buffer: 38.4GB)*
 
 ## 🌍 Dataset and Training
 
@@ -136,32 +139,32 @@ The system is optimized for various RAM volumes using the Fibonacci sequence for
 
 ### Installation
 ```bash
-# Clone repository
-git clone https://github.com/your-org/mozgach2.git
-cd Mozgach2
+# Repository cloning
+git clone https://github.com/your-org/mozgach108.git
+cd mozgach108
 
 # Install dependencies
 pip install -r requirements.txt
 
-# Download models
+# Model download
 python download_models.py --all
 ```
 
 ### Basic Usage
 ```python
-from mozgach2 import Mozgach2System
+from mozgach108 import mozgach108System
 
-# Initialize system
-mozgach = Mozgach2System()
+# System initialization
+mozgach = mozgach108System()
 
-# Get response from quantum entangled system
+# Getting response from quantum-entangled system
 response = mozgach.query("How does quantum entanglement work?")
 print(response)
 ```
 
 ### Advanced Usage
 ```python
-# Working with quantum entangled system
+# Working with quantum-entangled system
 response = mozgach.query(
     "Explain the principles of Buddhism"
 )
@@ -205,25 +208,24 @@ responses = mozgach.batch_query(queries)
 
 ### How to Participate
 1. **Fork** the repository
-2. **Create a branch** for new feature
+2. **Create a branch** for new functionality
 3. **Make changes** and test
-4. **Create Pull Request**
+4. **Create a Pull Request**
 
 ### Areas for Contribution
 - **Model optimization** for various devices
 - **Dataset expansion** with new languages and cultures
-- **Quantum entanglement improvement** between models
 - **Working with secret knowledge** and esoteric texts
 - **Documentation** and usage examples
 
 ## 📄 License
 
-The project is distributed under **NativeMindNONC** license. See [LICENSE](LICENSE) file for details.
+The project is distributed under the **NativeMindNONC** license. See the [LICENSE](LICENSE) file for details.
 
 ## 📞 Contacts
 
-- **GitHub Issues**: [Create issue](https://github.com/braindler/mozgach2/issues)
-- **Discord**: [Join server](https://discord.gg/mozgach2)
+- **GitHub Issues**: [Create issue](https://github.com/braindler/mozgach108/issues)
+- **Discord**: [Join server](https://discord.gg/mozgach108)
 - **Email**: thai@nativemind.net
 
 ## 🙏 Acknowledgments
@@ -232,9 +234,9 @@ Special thanks to:
 - **BRICS community** for cultural diversity
 - **Spiritual leaders** for wisdom and knowledge
 - **Keepers of secret knowledge** and esoteric texts
-- **AI researchers** for inspiration and technology
-- **All participants** in the project for their contribution
+- **AI researchers** for inspiration and technologies
+- **All project participants** for their contributions
 
 ---
 
-**Mozgach2** - where quantum entanglement meets artificial intelligence to create smarter and more understanding language models, including access to secret knowledge and esoteric wisdom. 🚀✨🔮
+**mozgach108** - where quantum entanglement meets artificial intelligence to create wiser and more understanding language models, including access to secret knowledge and esoteric wisdom. 🚀✨🔮
