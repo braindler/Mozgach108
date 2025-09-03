@@ -111,7 +111,7 @@ Mozgach2/
 ### Десктопные платформы
 - **Windows**: 10/11 (x64)
 - **macOS**: 10.15+ (Intel/Apple Silicon)
-- **Linux**: Ubuntu 18.04+, CentOS 7+
+- **Linux**: Ubuntu 18.04+, CentOS 7+, Avrora OS, AstraLinux OS
 - **Поддержка CUDA** и OpenCL
 
 ## 🚀 Быстрый старт
