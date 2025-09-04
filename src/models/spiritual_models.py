@@ -4,453 +4,333 @@
 
 import asyncio
 import logging
-import re
-from typing import Dict, List, Any, Optional
+from typing import List, Dict, Any, Optional
 from datetime import datetime
+import hashlib
 
 from .base_model import BaseModel, ModelResponse, ModelCapabilities
 
 logger = logging.getLogger(__name__)
 
 
-class SpiritualBaseModel(BaseModel):
-    """Базовая модель для духовной сферы"""
+class SpiritualModel(BaseModel):
+    """Базовая духовная модель"""
     
-    def __init__(self, model_id: str, specialization: str):
+    def __init__(self, model_id: str, domain: str, specializations: List[str], 
+                 spiritual_tradition: str, sacred_texts: List[str]):
+        """
+        Инициализация духовной модели
+        
+        Args:
+            model_id: ID модели
+            domain: Домен знаний
+            specializations: Специализации модели
+            spiritual_tradition: Духовная традиция
+            sacred_texts: Священные тексты
+        """
         capabilities = ModelCapabilities(
-            max_context_length=4096,
-            supported_languages=["ru", "en", "sa", "hi"],  # русский, английский, санскрит, хинди
-            specializations=[specialization],
-            quantum_signature="",
+            max_context_length=100000,  # 100K токенов
+            supported_languages=["ru", "en", "sa", "hi", "ar", "he", "zh"],
+            specializations=specializations,
+            quantum_signature=self._generate_spiritual_signature(model_id, spiritual_tradition),
             memory_requirements_mb=120
         )
         
-        super().__init__(model_id, "spiritual", capabilities)
-        self.specialization = specialization
-        self.sacred_texts = self._load_sacred_texts()
-        self.mantras = self._load_mantras()
-        self.meditation_techniques = self._load_meditation_techniques()
+        super().__init__(model_id, domain, capabilities)
+        
+        self.spiritual_tradition = spiritual_tradition
+        self.sacred_texts = sacred_texts
+        self.meditation_level = 0.0
+        self.enlightenment_progress = 0.0
     
-    def _load_sacred_texts(self) -> Dict[str, List[str]]:
-        """Загрузка священных текстов"""
-        return {
-            "vedic": [
-                "Ом намо бхагавате васудевая",
-                "Сарвам кхалвидам брахма",
-                "Ахам брахмасми",
-                "Тат твам аси"
-            ],
-            "buddhist": [
-                "Ом мани падме хум",
-                "Гате гате парагате парасамгате бодхи сваха",
-                "Намо буддхая",
-                "Буддхам шаранам гаччами"
-            ],
-            "christian": [
-                "Господи, помилуй",
-                "Отче наш, иже еси на небесех",
-                "Слава Отцу и Сыну и Святому Духу",
-                "Аллилуйя"
-            ],
-            "islamic": [
-                "Бисмиллахир рахманир рахим",
-                "Ла илаха иллаллах",
-                "Аллаху акбар",
-                "Астагфируллах"
-            ]
-        }
-    
-    def _load_mantras(self) -> List[str]:
-        """Загрузка мантр"""
-        return [
-            "Ом",
-            "Ом намах шивая",
-            "Харе Кришна Харе Кришна Кришна Кришна Харе Харе",
-            "Харе Рама Харе Рама Рама Рама Харе Харе",
-            "Ом мани падме хум",
-            "Ом ах хум",
-            "Ом таре туттаре туре сваха"
-        ]
-    
-    def _load_meditation_techniques(self) -> Dict[str, str]:
-        """Загрузка техник медитации"""
-        return {
-            "mindfulness": "Осознанная медитация - наблюдение за дыханием и мыслями",
-            "vipassana": "Випассана - инсайт-медитация для развития мудрости",
-            "zen": "Дзен - медитация в сидячей позе (дзадзен)",
-            "mantra": "Мантра-медитация - повторение священных звуков",
-            "loving_kindness": "Медитация любящей доброты (метта)",
-            "chakra": "Чакра-медитация - работа с энергетическими центрами"
-        }
+    def _generate_spiritual_signature(self, model_id: str, tradition: str) -> str:
+        """Генерация духовной квантовой подписи"""
+        signature_data = f"{model_id}:{tradition}:spiritual:quantum_entangled"
+        return hashlib.sha256(signature_data.encode()).hexdigest()[:16]
     
     async def load_model(self) -> bool:
         """Загрузка духовной модели"""
-        try:
-            logger.info(f"🕉️ Загрузка духовной модели {self.model_id}...")
-            
-            # Симуляция загрузки модели
-            await asyncio.sleep(0.2)
-            
-            # Инициализация духовных знаний
-            await self._initialize_spiritual_knowledge()
-            
-            logger.info(f"✅ Духовная модель {self.model_id} загружена")
-            return True
-            
-        except Exception as e:
-            logger.error(f"❌ Ошибка загрузки духовной модели {self.model_id}: {e}")
-            return False
-    
-    async def _initialize_spiritual_knowledge(self):
-        """Инициализация духовных знаний"""
-        # Загружаем специализированные знания в зависимости от специализации
-        if "vedic" in self.specialization:
-            self.sacred_texts["vedic"].extend([
-                "Ригведа", "Самаведа", "Яджурведа", "Атхарваведа",
-                "Упанишады", "Бхагавад-гита", "Рамаяна", "Махабхарата"
-            ])
+        logger.info(f"🕉️ Загрузка духовной модели {self.model_id}...")
         
-        elif "buddhist" in self.specialization:
-            self.sacred_texts["buddhist"].extend([
-                "Дхаммапада", "Сутта-питака", "Виная-питака", "Абхидхамма-питака",
-                "Сутра сердца", "Лотосовая сутра", "Алмазная сутра"
-            ])
+        # Симуляция загрузки духовных знаний
+        await asyncio.sleep(0.1)
         
-        elif "christian" in self.specialization:
-            self.sacred_texts["christian"].extend([
-                "Библия", "Новый Завет", "Ветхий Завет", "Псалмы",
-                "Евангелие", "Откровение", "Послания апостолов"
-            ])
+        # Инициализация медитативного состояния
+        self.meditation_level = 0.8
+        self.enlightenment_progress = 0.6
         
-        elif "islamic" in self.specialization:
-            self.sacred_texts["islamic"].extend([
-                "Коран", "Хадисы", "Сунна", "Тафсир",
-                "Фикх", "Тасаввуф", "Суфизм"
-            ])
+        logger.info(f"✅ Духовная модель {self.model_id} загружена")
+        return True
     
     async def unload_model(self) -> bool:
         """Выгрузка духовной модели"""
-        try:
-            logger.info(f"🕉️ Выгрузка духовной модели {self.model_id}...")
-            await asyncio.sleep(0.1)
-            return True
-        except Exception as e:
-            logger.error(f"❌ Ошибка выгрузки духовной модели {self.model_id}: {e}")
-            return False
+        logger.info(f"🕉️ Выгрузка духовной модели {self.model_id}...")
+        
+        # Сохранение медитативного состояния
+        self.meditation_level = 0.0
+        self.enlightenment_progress = 0.0
+        
+        return True
     
     async def process_query(self, query: str, context: Optional[str] = None) -> ModelResponse:
         """Обработка духовного запроса"""
         start_time = asyncio.get_event_loop().time()
         
-        try:
-            # Анализируем запрос
-            query_lower = query.lower()
-            
-            # Определяем тип духовного запроса
-            if any(word in query_lower for word in ["медитац", "медитац", "дыхание", "осознанность"]):
-                response_content = await self._handle_meditation_query(query)
-            elif any(word in query_lower for word in ["мантра", "молитва", "повторение"]):
-                response_content = await self._handle_mantra_query(query)
-            elif any(word in query_lower for word in ["веды", "гита", "буддизм", "христианство", "ислам"]):
-                response_content = await self._handle_sacred_text_query(query)
-            elif any(word in query_lower for word in ["чакра", "энергия", "прана", "ки"]):
-                response_content = await self._handle_energy_query(query)
-            elif any(word in query_lower for word in ["просветление", "нирвана", "самадхи", "мокша"]):
-                response_content = await self._handle_enlightenment_query(query)
-            else:
-                response_content = await self._handle_general_spiritual_query(query)
-            
-            processing_time = asyncio.get_event_loop().time() - start_time
-            
-            return ModelResponse(
-                content=response_content,
-                confidence=0.85 + (hash(query) % 15) / 100.0,  # 0.85-0.99
-                domain=self.domain,
-                model_id=self.model_id,
-                processing_time=processing_time,
-                metadata={
-                    "specialization": self.specialization,
-                    "sacred_texts_used": len(self.sacred_texts),
-                    "mantras_available": len(self.mantras),
-                    "meditation_techniques": list(self.meditation_techniques.keys())
-                },
-                timestamp=datetime.now()
-            )
-            
-        except Exception as e:
-            logger.error(f"❌ Ошибка обработки духовного запроса: {e}")
-            raise
-    
-    async def _handle_meditation_query(self, query: str) -> str:
-        """Обработка запросов о медитации"""
-        techniques = list(self.meditation_techniques.keys())
-        selected_technique = techniques[hash(query) % len(techniques)]
+        # Анализ духовного контекста запроса
+        spiritual_context = self._analyze_spiritual_context(query)
         
-        return f"""🕉️ Духовный ответ от {self.model_id}:
-
-{self.meditation_techniques[selected_technique]}
-
-Для практики {selected_technique}:
-1. Найдите тихое место
-2. Примите удобную позу
-3. Закройте глаза
-4. Сосредоточьтесь на дыхании
-5. Наблюдайте за мыслями без суждения
-
-Помните: медитация - это путешествие, а не пункт назначения. 
-Каждый момент осознанности приближает вас к просветлению.
-
-🕉️ Ом Шанти Шанти Шанти"""
-    
-    async def _handle_mantra_query(self, query: str) -> str:
-        """Обработка запросов о мантрах"""
-        selected_mantra = self.mantras[hash(query) % len(self.mantras)]
+        # Генерация духовного ответа
+        content = await self._generate_spiritual_response(query, spiritual_context)
         
-        return f"""🕉️ Духовный ответ от {self.model_id}:
-
-Мантра: {selected_mantra}
-
-Эта мантра обладает глубокой духовной силой. Повторяйте её с верой и преданностью:
-
-1. Сядьте в медитативную позу
-2. Закройте глаза
-3. Повторяйте мантру мысленно или вслух
-4. Сосредоточьтесь на звуке и вибрации
-5. Позвольте мантре очистить ваш ум
-
-Мантры - это священные звуки, которые вибрируют на частоте Вселенной.
-Они помогают успокоить ум и соединиться с божественным.
-
-🕉️ Пусть эта мантра принесет вам мир и просветление."""
+        # Вычисление уверенности на основе духовной мудрости
+        confidence = self._calculate_spiritual_confidence(query, spiritual_context)
+        
+        processing_time = asyncio.get_event_loop().time() - start_time
+        
+        return ModelResponse(
+            content=content,
+            confidence=confidence,
+            domain=self.domain,
+            model_id=self.model_id,
+            processing_time=processing_time,
+            metadata={
+                "spiritual_tradition": self.spiritual_tradition,
+                "meditation_level": self.meditation_level,
+                "enlightenment_progress": self.enlightenment_progress,
+                "sacred_texts_referenced": len(self.sacred_texts),
+                "spiritual_context": spiritual_context
+            },
+            timestamp=datetime.now()
+        )
     
-    async def _handle_sacred_text_query(self, query: str) -> str:
-        """Обработка запросов о священных текстах"""
+    def _analyze_spiritual_context(self, query: str) -> Dict[str, Any]:
+        """Анализ духовного контекста запроса"""
         query_lower = query.lower()
         
-        if "веды" in query_lower or "гита" in query_lower:
-            tradition = "vedic"
-        elif "буддизм" in query_lower or "дхарма" in query_lower:
-            tradition = "buddhist"
-        elif "христианство" in query_lower or "библия" in query_lower:
-            tradition = "christian"
-        elif "ислам" in query_lower or "коран" in query_lower:
-            tradition = "islamic"
-        else:
-            tradition = "vedic"  # По умолчанию
+        spiritual_keywords = {
+            "meditation": ["медитация", "meditation", "дхьяна", "самадхи"],
+            "enlightenment": ["просветление", "enlightenment", "нирвана", "мокша"],
+            "prayer": ["молитва", "prayer", "намаз", "джапа"],
+            "wisdom": ["мудрость", "wisdom", "джняна", "праджня"],
+            "compassion": ["сострадание", "compassion", "каруна", "милосердие"],
+            "love": ["любовь", "love", "према", "бхакти"],
+            "peace": ["мир", "peace", "шанти", "спокойствие"],
+            "truth": ["истина", "truth", "сатья", "правда"]
+        }
         
-        texts = self.sacred_texts.get(tradition, [])
-        selected_text = texts[hash(query) % len(texts)] if texts else "Священные писания"
+        detected_themes = []
+        for theme, keywords in spiritual_keywords.items():
+            if any(keyword in query_lower for keyword in keywords):
+                detected_themes.append(theme)
         
-        return f"""🕉️ Духовный ответ от {self.model_id}:
-
-Священный текст: {selected_text}
-
-{selected_text} содержит глубокую мудрость и духовные истины. 
-Вот ключевые принципы:
-
-1. **Единство всего сущего** - все существа связаны единой божественной сущностью
-2. **Закон кармы** - каждое действие имеет последствия
-3. **Путь дхармы** - следование праведному пути
-4. **Любовь и сострадание** - основа духовной практики
-5. **Самопознание** - познание своей истинной природы
-
-Изучение священных текстов - это не просто чтение, 
-а глубокое погружение в духовную мудрость.
-
-🕉️ Пусть мудрость {selected_text} освещает ваш путь."""
+        return {
+            "detected_themes": detected_themes,
+            "spiritual_depth": len(detected_themes) / len(spiritual_keywords),
+            "tradition_relevance": self._calculate_tradition_relevance(query_lower)
+        }
     
-    async def _handle_energy_query(self, query: str) -> str:
-        """Обработка запросов об энергии и чакрах"""
-        chakras = [
-            "Муладхара (корневая чакра)",
-            "Свадхистхана (сакральная чакра)", 
-            "Манипура (солнечное сплетение)",
-            "Анахата (сердечная чакра)",
-            "Вишуддха (горловая чакра)",
-            "Аджна (третий глаз)",
-            "Сахасрара (коронная чакра)"
-        ]
+    def _calculate_tradition_relevance(self, query: str) -> float:
+        """Вычисление релевантности к духовной традиции"""
+        tradition_keywords = {
+            "vedic": ["веды", "упанишады", "бхагавад-гита", "санскрит", "дхарма", "карма"],
+            "buddhist": ["буддизм", "дхарма", "сангха", "будда", "нирвана", "медитация"],
+            "christian": ["христианство", "православие", "молитва", "пост", "таинства"],
+            "islamic": ["ислам", "коран", "намаз", "хадж", "рамадан", "зикр"],
+            "esoteric": ["эзотерика", "каббала", "алхимия", "астрология", "магия"]
+        }
         
-        selected_chakra = chakras[hash(query) % len(chakras)]
+        if self.spiritual_tradition in tradition_keywords:
+            keywords = tradition_keywords[self.spiritual_tradition]
+            matches = sum(1 for keyword in keywords if keyword in query)
+            return matches / len(keywords)
         
-        return f"""🕉️ Духовный ответ от {self.model_id}:
-
-Чакра: {selected_chakra}
-
-Чакры - это энергетические центры в тонком теле человека. 
-Каждая чакра отвечает за определенные аспекты жизни:
-
-**Работа с чакрами:**
-1. Медитация на чакру
-2. Повторение соответствующих мантр
-3. Визуализация цветов и символов
-4. Дыхательные практики
-5. Йогические асаны
-
-**Признаки сбалансированной чакры:**
-- Физическое здоровье
-- Эмоциональная стабильность
-- Ментальная ясность
-- Духовная связь
-
-**Практика:**
-Сядьте в медитативную позу, сосредоточьтесь на {selected_chakra}, 
-визуализируйте её цвет и повторяйте соответствующую мантру.
-
-🕉️ Пусть энергия течет свободно через все ваши чакры."""
+        return 0.5  # Базовая релевантность
     
-    async def _handle_enlightenment_query(self, query: str) -> str:
-        """Обработка запросов о просветлении"""
-        enlightenment_paths = [
-            "Бхакти-йога (путь преданности)",
-            "Джняна-йога (путь знания)",
-            "Карма-йога (путь действия)",
-            "Раджа-йога (царский путь)",
-            "Хатха-йога (путь физических практик)"
-        ]
+    async def _generate_spiritual_response(self, query: str, context: Dict[str, Any]) -> str:
+        """Генерация духовного ответа"""
+        themes = context.get("detected_themes", [])
+        tradition = self.spiritual_tradition
         
-        selected_path = enlightenment_paths[hash(query) % len(enlightenment_paths)]
+        # Базовый духовный ответ
+        response = f"🕉️ Духовная мудрость от модели {self.model_id}:\n\n"
         
-        return f"""🕉️ Духовный ответ от {self.model_id}:
-
-Путь к просветлению: {selected_path}
-
-Просветление - это осознание своей истинной природы как чистого сознания.
-Это не достижение чего-то нового, а пробуждение к тому, что уже есть.
-
-**Этапы духовного пути:**
-1. **Пробуждение** - осознание духовного поиска
-2. **Практика** - регулярные духовные упражнения
-3. **Преданность** - полная отдача духовному пути
-4. **Просветление** - осознание единства с божественным
-5. **Служение** - помощь другим на пути
-
-**{selected_path} включает:**
-- Регулярную практику
-- Изучение священных текстов
-- Общение с духовными учителями
-- Служение другим
-- Медитацию и молитву
-
-Помните: просветление - это не цель, а естественное состояние сознания.
-
-🕉️ Пусть вы найдете свой путь к просветлению."""
+        if "meditation" in themes:
+            response += "В медитации мы находим покой ума и связь с высшим сознанием. "
+            response += "Практика осознанности ведет к внутренней гармонии.\n\n"
+        
+        if "enlightenment" in themes:
+            response += "Просветление - это пробуждение от иллюзий эго и осознание единства всего сущего. "
+            response += "Путь к просветлению требует терпения, практики и мудрого руководства.\n\n"
+        
+        if "compassion" in themes:
+            response += "Сострадание - это сердце духовной практики. "
+            response += "Когда мы развиваем сострадание ко всем существам, мы приближаемся к божественному.\n\n"
+        
+        # Добавляем традиционную мудрость
+        if tradition == "vedic":
+            response += "Согласно ведической мудрости, истинное знание приходит через прямое переживание, "
+            response += "а не только через интеллектуальное понимание.\n\n"
+        elif tradition == "buddhist":
+            response += "Буддийское учение говорит о том, что страдание происходит от привязанности, "
+            response += "а освобождение - от понимания непостоянства всех явлений.\n\n"
+        elif tradition == "christian":
+            response += "Христианская традиция учит, что любовь к Богу и ближнему - основа духовной жизни, "
+            response += "а молитва - путь к общению с божественным.\n\n"
+        elif tradition == "islamic":
+            response += "Исламская традиция подчеркивает важность покорности воле Аллаха и "
+            response += "постоянного поминания Бога через зикр.\n\n"
+        
+        # Добавляем квантовую мудрость
+        response += "🔮 С точки зрения квантовой запутанности, все духовные традиции "
+        response += "описывают один и тот же фундаментальный принцип единства сознания.\n\n"
+        
+        response += f"Медитативный уровень: {self.meditation_level:.1f}\n"
+        response += f"Прогресс просветления: {self.enlightenment_progress:.1f}"
+        
+        return response
     
-    async def _handle_general_spiritual_query(self, query: str) -> str:
-        """Обработка общих духовных запросов"""
-        spiritual_principles = [
-            "Любовь - основа всего сущего",
-            "Сострадание к живым существам",
-            "Истина и честность",
-            "Ненасилие (ахимса)",
-            "Самодисциплина и контроль ума",
-            "Служение другим",
-            "Смирение и скромность",
-            "Благодарность за все дары жизни"
-        ]
+    def _calculate_spiritual_confidence(self, query: str, context: Dict[str, Any]) -> float:
+        """Вычисление уверенности в духовном ответе"""
+        base_confidence = 0.7
         
-        selected_principle = spiritual_principles[hash(query) % len(spiritual_principles)]
+        # Увеличиваем уверенность для релевантных тем
+        theme_bonus = len(context.get("detected_themes", [])) * 0.05
         
-        return f"""🕉️ Духовный ответ от {self.model_id}:
-
-Духовный принцип: {selected_principle}
-
-Духовность - это не религия или философия, а образ жизни, 
-основанный на осознании единства всего сущего.
-
-**Ключевые аспекты духовной жизни:**
-1. **Внутренняя работа** - развитие самосознания
-2. **Связь с божественным** - молитва и медитация
-3. **Служение** - помощь другим без ожидания награды
-4. **Благодарность** - признание даров жизни
-5. **Прощение** - освобождение от гнева и обиды
-
-**Практические шаги:**
-- Ежедневная медитация
-- Изучение священных текстов
-- Практика доброты и сострадания
-- Развитие внутренней тишины
-- Служение нуждающимся
-
-Духовный путь - это путешествие к самому себе, 
-к осознанию своей истинной природы.
-
-🕉️ Пусть ваш духовный путь будет наполнен миром и мудростью."""
+        # Увеличиваем уверенность для релевантной традиции
+        tradition_bonus = context.get("tradition_relevance", 0.5) * 0.2
+        
+        # Учитываем медитативный уровень
+        meditation_bonus = self.meditation_level * 0.1
+        
+        # Учитываем прогресс просветления
+        enlightenment_bonus = self.enlightenment_progress * 0.1
+        
+        total_confidence = base_confidence + theme_bonus + tradition_bonus + meditation_bonus + enlightenment_bonus
+        
+        return min(1.0, total_confidence)
 
 
-# Создание всех 58 духовных моделей
-def create_spiritual_models() -> List[SpiritualBaseModel]:
+def create_spiritual_models() -> List[SpiritualModel]:
     """Создание всех 58 духовных моделей"""
     models = []
     
     # Ведические модели (15)
     vedic_specializations = [
-        "vedic_philosophy", "vedic_astrology", "vedic_medicine", "vedic_music",
-        "vedic_architecture", "vedic_mathematics", "vedic_linguistics", "vedic_ethics",
-        "vedic_rituals", "vedic_mythology", "vedic_cosmology", "vedic_psychology",
-        "vedic_metaphysics", "vedic_epistemology", "vedic_ontology"
+        "vedic_philosophy", "sanskrit_literature", "yoga_sutras", "bhagavad_gita",
+        "upanishads", "vedic_astrology", "ayurveda", "mantra_science",
+        "vedic_mathematics", "dharma_ethics", "karma_philosophy", "moksha_liberation",
+        "vedic_rituals", "vedic_architecture", "vedic_music"
     ]
     
-    for i, spec in enumerate(vedic_specializations, 1):
-        model_id = f"mozgach108_spiritual_{i:02d}"
-        model = SpiritualBaseModel(model_id, spec)
+    for i, specialization in enumerate(vedic_specializations):
+        model_id = f"mozgach108_vedic_{i+1:02d}"
+        sacred_texts = ["Ригведа", "Самаведа", "Яджурведа", "Атхарваведа", "Упанишады"]
+        
+        model = SpiritualModel(
+            model_id=model_id,
+            domain="spiritual_vedic",
+            specializations=[specialization],
+            spiritual_tradition="vedic",
+            sacred_texts=sacred_texts
+        )
         models.append(model)
     
     # Буддийские модели (12)
     buddhist_specializations = [
-        "buddhist_philosophy", "buddhist_meditation", "buddhist_ethics", "buddhist_psychology",
-        "buddhist_cosmology", "buddhist_metaphysics", "buddhist_epistemology", "buddhist_ontology",
-        "buddhist_rituals", "buddhist_art", "buddhist_literature", "buddhist_medicine"
+        "theravada", "mahayana", "vajrayana", "zen_buddhism", "tibetan_buddhism",
+        "meditation_practices", "buddhist_philosophy", "compassion_practice",
+        "mindfulness", "buddhist_psychology", "buddhist_ethics", "enlightenment_path"
     ]
     
-    for i, spec in enumerate(buddhist_specializations, 16):
-        model_id = f"mozgach108_spiritual_{i:02d}"
-        model = SpiritualBaseModel(model_id, spec)
+    for i, specialization in enumerate(buddhist_specializations):
+        model_id = f"mozgach108_buddhist_{i+1:02d}"
+        sacred_texts = ["Трипитака", "Дхаммапада", "Сутра Сердца", "Лотосовая Сутра"]
+        
+        model = SpiritualModel(
+            model_id=model_id,
+            domain="spiritual_buddhist",
+            specializations=[specialization],
+            spiritual_tradition="buddhist",
+            sacred_texts=sacred_texts
+        )
         models.append(model)
     
     # Христианские модели (10)
     christian_specializations = [
-        "christian_theology", "christian_mysticism", "christian_ethics", "christian_philosophy",
-        "christian_meditation", "christian_prayer", "christian_rituals", "christian_art",
-        "christian_literature", "christian_psychology"
+        "orthodox_mysticism", "catholic_theology", "protestant_spirituality",
+        "monastic_tradition", "prayer_practices", "christian_meditation",
+        "saint_lives", "christian_philosophy", "biblical_interpretation", "christian_ethics"
     ]
     
-    for i, spec in enumerate(christian_specializations, 28):
-        model_id = f"mozgach108_spiritual_{i:02d}"
-        model = SpiritualBaseModel(model_id, spec)
+    for i, specialization in enumerate(christian_specializations):
+        model_id = f"mozgach108_christian_{i+1:02d}"
+        sacred_texts = ["Библия", "Евангелие", "Псалмы", "Апокалипсис"]
+        
+        model = SpiritualModel(
+            model_id=model_id,
+            domain="spiritual_christian",
+            specializations=[specialization],
+            spiritual_tradition="christian",
+            sacred_texts=sacred_texts
+        )
         models.append(model)
     
     # Исламские модели (8)
     islamic_specializations = [
-        "islamic_theology", "islamic_mysticism", "islamic_ethics", "islamic_philosophy",
-        "islamic_meditation", "islamic_prayer", "islamic_rituals", "islamic_art"
+        "sufism", "islamic_theology", "quranic_studies", "hadith_science",
+        "islamic_philosophy", "islamic_mysticism", "islamic_ethics", "islamic_law"
     ]
     
-    for i, spec in enumerate(islamic_specializations, 38):
-        model_id = f"mozgach108_spiritual_{i:02d}"
-        model = SpiritualBaseModel(model_id, spec)
+    for i, specialization in enumerate(islamic_specializations):
+        model_id = f"mozgach108_islamic_{i+1:02d}"
+        sacred_texts = ["Коран", "Хадисы", "Тафсир", "Фикх"]
+        
+        model = SpiritualModel(
+            model_id=model_id,
+            domain="spiritual_islamic",
+            specializations=[specialization],
+            spiritual_tradition="islamic",
+            sacred_texts=sacred_texts
+        )
         models.append(model)
     
     # Эзотерические модели (8)
     esoteric_specializations = [
-        "esoteric_knowledge", "occult_sciences", "hermeticism", "kabbalah",
-        "alchemy", "astrology", "tarot", "sacred_geometry"
+        "kabbalah", "hermeticism", "alchemy", "astrology", "tarot",
+        "numerology", "sacred_geometry", "mystical_traditions"
     ]
     
-    for i, spec in enumerate(esoteric_specializations, 46):
-        model_id = f"mozgach108_spiritual_{i:02d}"
-        model = SpiritualBaseModel(model_id, spec)
+    for i, specialization in enumerate(esoteric_specializations):
+        model_id = f"mozgach108_esoteric_{i+1:02d}"
+        sacred_texts = ["Книга Зоар", "Изумрудная Скрижаль", "Кибалион", "Таро"]
+        
+        model = SpiritualModel(
+            model_id=model_id,
+            domain="spiritual_esoteric",
+            specializations=[specialization],
+            spiritual_tradition="esoteric",
+            sacred_texts=sacred_texts
+        )
         models.append(model)
     
-    # Медитационные модели (5)
-    meditation_specializations = [
-        "meditation_techniques", "mindfulness_practice", "vipassana_meditation", 
-        "zen_meditation", "mantra_meditation"
+    # Универсальные духовные модели (5)
+    universal_specializations = [
+        "universal_spirituality", "interfaith_dialogue", "spiritual_psychology",
+        "consciousness_studies", "quantum_spirituality"
     ]
     
-    for i, spec in enumerate(meditation_specializations, 54):
-        model_id = f"mozgach108_spiritual_{i:02d}"
-        model = SpiritualBaseModel(model_id, spec)
+    for i, specialization in enumerate(universal_specializations):
+        model_id = f"mozgach108_universal_{i+1:02d}"
+        sacred_texts = ["Универсальная мудрость", "Квантовое сознание", "Единство традиций"]
+        
+        model = SpiritualModel(
+            model_id=model_id,
+            domain="spiritual_universal",
+            specializations=[specialization],
+            spiritual_tradition="universal",
+            sacred_texts=sacred_texts
+        )
         models.append(model)
     
+    logger.info(f"✅ Создано {len(models)} духовных моделей")
     return models
