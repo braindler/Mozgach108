@@ -148,3 +148,4 @@
 *"SQL is the standard language for managing and manipulating relational databases, providing powerful tools for data storage, retrieval, and analysis."* - SQL Wisdom
 
 
+
