@@ -146,3 +146,5 @@
 ---
 
 *"Laravel is a web application framework with expressive, elegant syntax designed for the development of web applications."* - Laravel Wisdom
+
+

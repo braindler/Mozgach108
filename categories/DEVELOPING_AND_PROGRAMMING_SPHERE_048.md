@@ -146,3 +146,5 @@
 ---
 
 *"Core Data is a framework that provides an object graph management and persistence framework for iOS, macOS, watchOS, and tvOS applications."* - Core Data Wisdom
+
+
